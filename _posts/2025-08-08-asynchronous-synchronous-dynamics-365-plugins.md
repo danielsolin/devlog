@@ -12,9 +12,9 @@ tags:
   - Synchronous
 ---
 
-When developing plugins that interact with external APIs, you quickly run into a major limitation: 𝘁𝗵𝗲 𝗗𝗮𝘁𝗮𝘃𝗲𝗿𝘀𝗲 𝗽𝗹𝘂𝗴𝗶𝗻 𝘀𝗮𝗻𝗱𝗯𝗼𝘅 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗿𝗲𝗹𝗶𝗮𝗯𝗹𝘆 𝘀𝘂𝗽𝗽𝗼𝗿𝘁 𝗮𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 𝗲𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻. While it's technically possible to use async/await or Task.Run, doing so within the sandbox is risky and unsupported. These approaches may appear to work in development or isolated cases, but they often result in unpredictable behavior, such as deadlocks, thread aborts, or context corruption. Especially under load.
+When developing plugins that interact with external APIs, you quickly run into a major limitation: **the Dataverse plugin sandbox does not reliably support asynchronous execution**. While it's technically possible to use async/await or Task.Run, doing so within the sandbox is risky and unsupported. These approaches may appear to work in development or isolated cases, but they often result in unpredictable behavior, such as deadlocks, thread aborts, or context corruption. Especially under load.
 
-Because all plugin code must be 𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 and complete within its execution time limits, scenarios that would benefit from parallelism — like making multiple HTTP calls simultaneously — become difficult or unsafe to implement directly in the plugin.
+Because all plugin code must be **synchronous** and complete within its execution time limits, scenarios that would benefit from parallelism — like making multiple HTTP calls simultaneously — become difficult or unsafe to implement directly in the plugin.
 
 Full source code for this article can be found here:
 
