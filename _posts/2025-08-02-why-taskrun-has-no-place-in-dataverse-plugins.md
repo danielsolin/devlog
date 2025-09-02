@@ -1,6 +1,6 @@
 ---
 layout: post.njk
-title: "WHY TASK.RUN() HAS NO PLACE IN DATAVERSE PLUGINS"
+title: "Why Task.Run() Has No Place in Dataverse Plugins"
 description: "An article about why Task.Run() should not be used in Dataverse plugins."
 date: 2025-08-02
 tags:
@@ -10,13 +10,11 @@ tags:
   - C#
 ---
 
-**WHY TASK.RUN() HAS NO PLACE IN DATAVERSE PLUGINS**
-
 Dataverse plugins are isolated pieces of .NET code that run on the server when certain events happen. Like creating, updating, or deleting a record. You can register a plugin to run synchronously (runs immediately and blocks the request) or asynchronously (queued to run later).
 
 Sometimes developers try to get the best of both worlds by keeping a step synchronous, but inside it use Task.Run() to offload something “in the background.” It looks harmless, but unfortunately isn’t.
 
-**WHAT TASK.RUN() DOES**
+**What Task.Run() Does**
 
 Task.Run() pushes work to the .NET thread pool. In a normal application it makes perfect sense, but in Dataverse Plugin, the environment is not designed for it.
 
