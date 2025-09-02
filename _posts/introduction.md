@@ -6,4 +6,4 @@ date: 2025-09-02
 tags: ["intro"]
 ---
 
-This is my first post about Dataverse coding.
+This is my first post on devlog.se.

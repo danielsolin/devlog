@@ -1,14 +1,14 @@
 {
-  "name": "dataversecoding",
+  "name": "devlog",
   "version": "1.0.0",
-  "description": "",
+  "description": "A blog about software development.",
   "main": "index.js",
   "scripts": {
     "start": "eleventy --serve",
     "build": "eleventy"
   },
   "keywords": [],
-  "author": "",
+  "author": "Daniel",
   "license": "ISC",
   "devDependencies": {
     "@11ty/eleventy": "^3.1.2"

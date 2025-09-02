@@ -11,6 +11,9 @@ module.exports = function(eleventyConfig) {
     return collectionApi.getFilteredByGlob("_posts/**/*.md").reverse();
   });
 
+  eleventyConfig.ignores.add("README.md");
+  eleventyConfig.ignores.add("GEMINI.md");
+
   return {
     dir: {
       input: ".",

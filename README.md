@@ -1,6 +1,6 @@
-# A statically generated blog using Eleventy and Markdown
+# A statically generated blog about software development
 
-This is a starter project for a blog using [Eleventy](https://www.11ty.dev/) to generate a static website from Markdown files.
+This is a blog about software development using [Eleventy](https://www.11ty.dev/) to generate a static website from Markdown files.
 
 ## How to use
 
