@@ -1,6 +1,6 @@
 ---
 layout: post.njk
-title: First Steps
+title: Introduction
 ---
 
 This is my first post about Dataverse coding.
