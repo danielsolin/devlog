@@ -1,0 +1,8 @@
+# Ignore build output
+_site
+
+# Ignore dependencies
+node_modules
+
+# Ignore package lock files
+package-lock.json
