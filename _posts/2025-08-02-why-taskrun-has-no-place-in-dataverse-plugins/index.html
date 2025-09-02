@@ -1,17 +1,31 @@
-<hr>
-<p>layout: post.njk<br>
-title: &quot;Why Task.Run() Has No Place in Dataverse Plugins&quot;<br>
-description: &quot;An article about why Task.Run() should not be used in Dataverse plugins.&quot;<br>
-date: 2025-08-02<br>
-tags:</p>
-<ul>
-<li>Dataverse</li>
-<li>Plugins</li>
-<li>Task.Run</li>
-<li>C#</li>
-</ul>
-<hr>
-<p>Dataverse plugins are isolated pieces of .NET code that run on the server when certain events happen. Like creating, updating, or deleting a record. You can register a plugin to run synchronously (runs immediately and blocks the request) or asynchronously (queued to run later).</p>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Why Task.Run() Has No Place in Dataverse Plugins</title>
+    <link rel="stylesheet" href="/devlog/css/style.css" />
+  </head>
+  <body>
+    <main>
+<article>
+  <h1>Why Task.Run() Has No Place in Dataverse Plugins</h1>
+
+   
+  <p>
+    <em>
+      By Daniel Solin on 2025-08-02
+    </em>
+  </p>
+   
+  <p>
+    Tags: 
+    <span>Dataverse</span>,  
+    <span>Plugins</span>,  
+    <span>Task.Run</span>,  
+    <span>C#</span> 
+  </p>
+   <p>Dataverse plugins are isolated pieces of .NET code that run on the server when certain events happen. Like creating, updating, or deleting a record. You can register a plugin to run synchronously (runs immediately and blocks the request) or asynchronously (queued to run later).</p>
 <p>Sometimes developers try to get the best of both worlds by keeping a step synchronous, but inside it use Task.Run() to offload something “in the background.” It looks harmless, but unfortunately isn’t.</p>
 <p><strong>What Task.Run() Does</strong></p>
 <p>Task.Run() pushes work to the .NET thread pool. In a normal application it makes perfect sense, but in Dataverse Plugin, the environment is not designed for it.</p>
@@ -48,3 +62,12 @@ tags:</p>
 </ul>
 <p><strong>Conclusion</strong></p>
 <p>If you need background work, use a supported mechanism. Task.Run() in a plugin is like running a side job in a house you don’t own - someone can walk in and switch off the lights at any moment.</p>
+
+
+  <footer>
+    <a href="javascript:history.back()">Back</a>
+  </footer>
+</article>
+</main>
+  </body>
+</html>

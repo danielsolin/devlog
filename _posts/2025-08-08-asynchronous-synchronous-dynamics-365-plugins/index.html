@@ -1,19 +1,33 @@
-<hr>
-<p>layout: post.njk<br>
-title: &quot;Asynchronous Synchronous Dynamics 365 Plugins&quot;<br>
-description: &quot;An article about achieving asynchronous behavior in synchronous Dataverse plugins using Azure Functions.&quot;<br>
-date: 2025-08-08<br>
-tags:</p>
-<ul>
-<li>Dataverse</li>
-<li>Plugins</li>
-<li>Azure Functions</li>
-<li>C#</li>
-<li>Asynchronous</li>
-<li>Synchronous</li>
-</ul>
-<hr>
-<p>When developing plugins that interact with external APIs, you quickly run into a major limitation: 𝘁𝗵𝗲 𝗗𝗮𝘁𝗮𝘃𝗲𝗿𝘀𝗲 𝗽𝗹𝘂𝗴𝗶𝗻 𝘀𝗮𝗻𝗱𝗯𝗼𝘅 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗿𝗲𝗹𝗶𝗮𝗯𝗹𝘆 𝘀𝘂𝗽𝗽𝗼𝗿𝘁 𝗮𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 𝗲𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻. While it's technically possible to use async/await or Task.Run, doing so within the sandbox is risky and unsupported. These approaches may appear to work in development or isolated cases, but they often result in unpredictable behavior, such as deadlocks, thread aborts, or context corruption. Especially under load.</p>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Asynchronous Synchronous Dynamics 365 Plugins</title>
+    <link rel="stylesheet" href="/devlog/css/style.css" />
+  </head>
+  <body>
+    <main>
+<article>
+  <h1>Asynchronous Synchronous Dynamics 365 Plugins</h1>
+
+   
+  <p>
+    <em>
+      By Daniel Solin on 2025-08-08
+    </em>
+  </p>
+   
+  <p>
+    Tags: 
+    <span>Dataverse</span>,  
+    <span>Plugins</span>,  
+    <span>Azure Functions</span>,  
+    <span>C#</span>,  
+    <span>Asynchronous</span>,  
+    <span>Synchronous</span> 
+  </p>
+   <p>When developing plugins that interact with external APIs, you quickly run into a major limitation: 𝘁𝗵𝗲 𝗗𝗮𝘁𝗮𝘃𝗲𝗿𝘀𝗲 𝗽𝗹𝘂𝗴𝗶𝗻 𝘀𝗮𝗻𝗱𝗯𝗼𝘅 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗿𝗲𝗹𝗶𝗮𝗯𝗹𝘆 𝘀𝘂𝗽𝗽𝗼𝗿𝘁 𝗮𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 𝗲𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻. While it's technically possible to use async/await or Task.Run, doing so within the sandbox is risky and unsupported. These approaches may appear to work in development or isolated cases, but they often result in unpredictable behavior, such as deadlocks, thread aborts, or context corruption. Especially under load.</p>
 <p>Because all plugin code must be 𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 and complete within its execution time limits, scenarios that would benefit from parallelism — like making multiple HTTP calls simultaneously — become difficult or unsafe to implement directly in the plugin.</p>
 <p>Full source code for this article can be found here:</p>
 <p>https://github.com/danielsolin/articles/tree/main/DS.Articles.AsyncSyncPlugin</p>
@@ -184,3 +198,12 @@ public async Task&lt;IActionResult&gt; Run(
 </code></pre>
 <p><strong>Summary</strong></p>
 <p>Yes — it’s possible to get asynchronous behavior inside a synchronous Dataverse plugin. You just need to offload the parallel work to something that’s allowed to perform threading and asynchronous operations. In this case, that something is an Azure Function (but again - it could be something else), which can run the workload in parallel and return the result synchronously to the plugin.</p>
+
+
+  <footer>
+    <a href="javascript:history.back()">Back</a>
+  </footer>
+</article>
+</main>
+  </body>
+</html>
