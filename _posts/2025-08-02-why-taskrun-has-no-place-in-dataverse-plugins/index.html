@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WHY TASK.RUN() HAS NO PLACE IN DATAVERSE PLUGINS</title>
+    <link rel="stylesheet" href="/devlog/css/style.css" />
+  </head>
+  <body>
+    <main>
+<article>
+  <h1>WHY TASK.RUN() HAS NO PLACE IN DATAVERSE PLUGINS</h1>
+
+  
+  
+  <p>
+    <em>
+      By Daniel Solin on 2025-08-02
+    </em>
+  </p>
+   
+  <p>
+    Tags: 
+    <span>Dataverse</span>,  
+    <span>Plugins</span>,  
+    <span>Task.Run</span>,  
+    <span>C#</span> 
+  </p>
+   <p><strong>WHY TASK.RUN() HAS NO PLACE IN DATAVERSE PLUGINS</strong></p>
+<p>Dataverse plugins are isolated pieces of .NET code that run on the server when certain events happen. Like creating, updating, or deleting a record. You can register a plugin to run synchronously (runs immediately and blocks the request) or asynchronously (queued to run later).</p>
+<p>Sometimes developers try to get the best of both worlds by keeping a step synchronous, but inside it use Task.Run() to offload something “in the background.” It looks harmless, but unfortunately isn’t.</p>
+<p><strong>WHAT TASK.RUN() DOES</strong></p>
+<p>Task.Run() pushes work to the .NET thread pool. In a normal application it makes perfect sense, but in Dataverse Plugin, the environment is not designed for it.</p>
+<p><strong>WHY IT’S A PROBLEM</strong></p>
+<ul>
+<li><strong>Sandbox teardown</strong> – Plugins run in an isolated sandbox process. Once your Execute method returns, the platform may unload the AppDomain or kill the sandbox. Any Task.Run() code still running will simply vanish.</li>
+<li><strong>Breaks the execution contract</strong> – Synchronous steps are meant to finish all work before returning. Background tasks break that assumption and create race conditions.</li>
+<li><strong>No transaction scope</strong> – In synchronous plugins, you’re usually inside a database transaction. Background tasks run outside it. If the main transaction fails, your background work is still committed — or vice versa.</li>
+<li><strong>Unsupported service calls</strong> – Services like IOrganizationService are tied to the plugin’s execution context. Calling them from another thread is unsupported and may fail in unpredictable ways.</li>
+<li><strong>Debugging headaches</strong> – Failures can be silent, and logs won’t match the order of execution you expect.</li>
+</ul>
+<p><strong>A QUICK EXAMPLE</strong></p>
+<pre><code class="language-csharp">public void Execute(IServiceProvider serviceProvider)
+{
+    var context = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
+    var factory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
+    var service = factory.CreateOrganizationService(context.UserId);
+
+    // Unsafe: background thread in plugin
+    Task.Run(() =&gt;
+    {
+        var email = new Entity(&quot;email&quot;);
+        // set fields...
+        service.Create(email); // May fail silently or never run
+    });
+}
+</code></pre>
+<p>It might work in development. It might even work in production. Until one day it doesn’t, and you have no logs explaining why.</p>
+<p><strong>SUPPORTED ALTERNATIVES</strong></p>
+<ul>
+<li><strong>Asynchronous plugin step</strong> – Register the step as async in the Plugin Registration Tool. Dataverse queues it and runs it reliably.</li>
+<li><strong>Webhook → Azure Function / queue</strong> – Offload the work to an external service. That external service, in turn, can run multiple threads in parallel for improved performance.</li>
+<li><strong>Power Automate</strong> – For user-level automation or integrations, a Dataverse-triggered flow is the modern replacement for classic workflows.</li>
+</ul>
+<p><strong>CONCLUSION</strong></p>
+<p>If you need background work, use a supported mechanism. Task.Run() in a plugin is like running a side job in a house you don’t own - someone can walk in and switch off the lights at any moment.</p>
+
+
+  <footer>
+    <a href="javascript:history.back()">Back</a>
+  </footer>
+</article>
+</main>
+  </body>
+</html>
