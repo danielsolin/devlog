@@ -31,9 +31,13 @@ Task.Run() pushes work to the .NET thread pool. In a normal application it makes
 ```csharp
 public void Execute(IServiceProvider serviceProvider)
 {
-    var context = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
-    var factory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
-    var service = factory.CreateOrganizationService(context.UserId);
+    var context = (IPluginExecutionContext)serviceProvider
+      .GetService(typeof(IPluginExecutionContext));
+    var factory = (IOrganizationServiceFactory)serviceProvider
+      .GetService(typeof(IOrganizationServiceFactory));
+    var service = factory.CreateOrganizationService(
+      context.UserId
+    );
 
     // Unsafe: background thread in plugin
     Task.Run(() =>

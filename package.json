@@ -17,6 +17,7 @@
     "prettier": "^3.6.2"
   },
   "dependencies": {
+    "@11ty/eleventy-plugin-syntaxhighlight": "^5.0.2",
     "luxon": "^3.7.1"
   }
 }

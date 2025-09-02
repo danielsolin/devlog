@@ -1,7 +1,10 @@
 const { DateTime } = require("luxon");
+const syntaxHighlight = require("@11ty/eleventy-plugin-syntaxhighlight");
 
 module.exports = function (eleventyConfig) {
+  eleventyConfig.addPlugin(syntaxHighlight);
   eleventyConfig.addPassthroughCopy("css");
+  eleventyConfig.addPassthroughCopy({ "node_modules/prismjs/themes/": "css/themes/" });
 
   eleventyConfig.addFilter("dateFormat", (dateObj) => {
     return DateTime.fromJSDate(dateObj).toFormat("yyyy-MM-dd");
