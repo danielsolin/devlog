@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ASYNCHRONOUS SYNCHRONOUS DYNAMICS 365 PLUGINS</title>
+    <title>Asynchronous Synchronous Dynamics 365 Plugins</title>
     <link rel="stylesheet" href="/devlog/css/style.css" />
   </head>
   <body>
     <main>
 <article>
-  <h1>ASYNCHRONOUS SYNCHRONOUS DYNAMICS 365 PLUGINS</h1>
+  <h1>Asynchronous Synchronous Dynamics 365 Plugins</h1>
 
   
   
@@ -28,24 +28,7 @@
     <span>Asynchronous</span>,  
     <span>Synchronous</span> 
   </p>
-   <hr>
-<p>layout: post.njk
-title: &quot;Asynchronous Synchronous Dynamics 365 Plugins&quot;
-description: &quot;An article about achieving asynchronous behavior in synchronous Dataverse plugins using Azure Functions.&quot;
-date: 2025-08-08
-tags:</p>
-<ul>
-<li>Dataverse</li>
-<li>Plugins</li>
-<li>Azure Functions</li>
-<li>C#</li>
-<li>Asynchronous</li>
-<li>Synchronous</li>
-</ul>
-<hr>
-<p><strong>Asynchronous Synchronous Dynamics 365 Plugins</strong></p>
-<p><strong>Problem: The Synchronous Wall in Dynamics 365 Plugins</strong></p>
-<p>When developing plugins that interact with external APIs, you quickly run into a major limitation: 𝘁𝗵𝗲 𝗗𝗮𝘁𝗮𝘃𝗲𝗿𝘀𝗲 𝗽𝗹𝘂𝗴𝗶𝗻 𝘀𝗮𝗻𝗱𝗯𝗼𝘅 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗿𝗲𝗹𝗶𝗮𝗯𝗹𝘆 𝘀𝘂𝗽𝗽𝗼𝗿𝘁 𝗮𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 𝗲𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻. While it's technically possible to use async/await or Task.Run, doing so within the sandbox is risky and unsupported. These approaches may appear to work in development or isolated cases, but they often result in unpredictable behavior, such as deadlocks, thread aborts, or context corruption. Especially under load.</p>
+   <p>When developing plugins that interact with external APIs, you quickly run into a major limitation: 𝘁𝗵𝗲 𝗗𝗮𝘁𝗮𝘃𝗲𝗿𝘀𝗲 𝗽𝗹𝘂𝗴𝗶𝗻 𝘀𝗮𝗻𝗱𝗯𝗼𝘅 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗿𝗲𝗹𝗶𝗮𝗯𝗹𝘆 𝘀𝘂𝗽𝗽𝗼𝗿𝘁 𝗮𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 𝗲𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻. While it's technically possible to use async/await or Task.Run, doing so within the sandbox is risky and unsupported. These approaches may appear to work in development or isolated cases, but they often result in unpredictable behavior, such as deadlocks, thread aborts, or context corruption. Especially under load.</p>
 <p>Because all plugin code must be 𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 and complete within its execution time limits, scenarios that would benefit from parallelism — like making multiple HTTP calls simultaneously — become difficult or unsafe to implement directly in the plugin.</p>
 <p>Full source code for this article can be found here:</p>
 <p>https://github.com/danielsolin/articles/tree/main/DS.Articles.AsyncSyncPlugin</p>
