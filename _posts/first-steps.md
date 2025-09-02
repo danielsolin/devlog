@@ -1,8 +1,6 @@
 ---
-layout: layout.njk
+layout: post.njk
 title: First Steps
 ---
 
-# First Steps
-
-This is my first post.
+This is my first post about Dataverse coding.
