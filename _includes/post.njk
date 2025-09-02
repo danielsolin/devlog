@@ -5,12 +5,12 @@ layout: layout.njk
 <article>
   <h1>{{ title }}</h1>
 
-  {% set displayAuthor = author or metadata.author %}
-  {% if displayAuthor or date %}
+  {% set displayAuthor = author or metadata.author %} {% if displayAuthor or
+  date %}
   <p>
     <em>
-      {% if displayAuthor %}By {{ displayAuthor }}{% endif %}{% if date %} on {{ date |
-      dateFormat }}{% endif %}
+      {% if displayAuthor %}By {{ displayAuthor }}{% endif %}{% if date %} on {{
+      date | dateFormat }}{% endif %}
     </em>
   </p>
   {% endif %} {% if tags %}
