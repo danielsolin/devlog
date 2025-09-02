@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Why Task.Run() Has No Place in Dataverse Plugins</title>
     <link rel="stylesheet" href="/devlog/css/style.css" />
+    <link rel="stylesheet" href="/devlog/css/themes/prism-okaidia.css" />
   </head>
   <body>
     <main>
@@ -38,21 +39,24 @@
 <li><strong>Debugging headaches</strong> – Failures can be silent, and logs won’t match the order of execution you expect.</li>
 </ul>
 <p><strong>A Quick Example</strong></p>
-<pre><code class="language-csharp">public void Execute(IServiceProvider serviceProvider)
-{
-    var context = (IPluginExecutionContext)serviceProvider.GetService(typeof(IPluginExecutionContext));
-    var factory = (IOrganizationServiceFactory)serviceProvider.GetService(typeof(IOrganizationServiceFactory));
-    var service = factory.CreateOrganizationService(context.UserId);
+<pre class="language-csharp"><code class="language-csharp"><span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Execute</span><span class="token punctuation">(</span><span class="token class-name">IServiceProvider</span> serviceProvider<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> context <span class="token operator">=</span> <span class="token punctuation">(</span>IPluginExecutionContext<span class="token punctuation">)</span>serviceProvider
+      <span class="token punctuation">.</span><span class="token function">GetService</span><span class="token punctuation">(</span><span class="token keyword">typeof</span><span class="token punctuation">(</span><span class="token type-expression class-name">IPluginExecutionContext</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> factory <span class="token operator">=</span> <span class="token punctuation">(</span>IOrganizationServiceFactory<span class="token punctuation">)</span>serviceProvider
+      <span class="token punctuation">.</span><span class="token function">GetService</span><span class="token punctuation">(</span><span class="token keyword">typeof</span><span class="token punctuation">(</span><span class="token type-expression class-name">IOrganizationServiceFactory</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> service <span class="token operator">=</span> factory<span class="token punctuation">.</span><span class="token function">CreateOrganizationService</span><span class="token punctuation">(</span>
+      context<span class="token punctuation">.</span>UserId
+    <span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    // Unsafe: background thread in plugin
-    Task.Run(() =&gt;
-    {
-        var email = new Entity(&quot;email&quot;);
-        // set fields...
-        service.Create(email); // May fail silently or never run
-    });
-}
-</code></pre>
+    <span class="token comment">// Unsafe: background thread in plugin</span>
+    Task<span class="token punctuation">.</span><span class="token function">Run</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span>
+    <span class="token punctuation">{</span>
+        <span class="token class-name"><span class="token keyword">var</span></span> email <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">Entity</span><span class="token punctuation">(</span><span class="token string">"email"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token comment">// set fields...</span>
+        service<span class="token punctuation">.</span><span class="token function">Create</span><span class="token punctuation">(</span>email<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// May fail silently or never run</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
 <p>It might work in development. It might even work in production. Until one day it doesn’t, and you have no logs explaining why.</p>
 <p><strong>Supported Alternatives</strong></p>
 <ul>

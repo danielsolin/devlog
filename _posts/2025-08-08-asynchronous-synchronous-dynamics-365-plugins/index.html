@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Asynchronous Synchronous Dynamics 365 Plugins</title>
     <link rel="stylesheet" href="/devlog/css/style.css" />
+    <link rel="stylesheet" href="/devlog/css/themes/prism-okaidia.css" />
   </head>
   <body>
     <main>
@@ -36,166 +37,162 @@
 <p>An Azure Function is used in this example, but it could be anything that supports asynchronous operations and can be called synchronously from the plugin.</p>
 <p><strong>Plugin Code (SyncPlugin.cs)</strong></p>
 <p>The plugin gathers a list of URLs, serializes them to JSON, sends them to the Azure Function, and synchronously waits for the combined result.</p>
-<pre><code class="language-csharp">public void Execute(IServiceProvider serviceProvider)
-{
-    // Define the URLs to be processed by the Azure Function
-    var urls = new[]
-    {
-        &quot;https://example.com/api/getdata1&quot;,
-        &quot;https://example.com/api/getdata2&quot;,
-        &quot;https://example.com/api/getdata3&quot;
-    };
+<pre class="language-csharp"><code class="language-csharp"><span class="token keyword">public</span> <span class="token return-type class-name"><span class="token keyword">void</span></span> <span class="token function">Execute</span><span class="token punctuation">(</span><span class="token class-name">IServiceProvider</span> serviceProvider<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    <span class="token comment">// Define the URLs to be processed by the Azure Function</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> urls <span class="token operator">=</span> <span class="token keyword">new</span><span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token punctuation">{</span>
+        <span class="token string">"https://example.com/api/getdata1"</span><span class="token punctuation">,</span>
+        <span class="token string">"https://example.com/api/getdata2"</span><span class="token punctuation">,</span>
+        <span class="token string">"https://example.com/api/getdata3"</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-    // Prepare the payload to send to the Azure Function
-    var payload = new
-    {
+    <span class="token comment">// Prepare the payload to send to the Azure Function</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> payload <span class="token operator">=</span> <span class="token keyword">new</span>
+    <span class="token punctuation">{</span>
         urls
-    };
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-    var json = JsonConvert.SerializeObject(payload);
-    var content = new StringContent(
-        json, Encoding.UTF8, &quot;application/json&quot;);
+    <span class="token class-name"><span class="token keyword">var</span></span> json <span class="token operator">=</span> JsonConvert<span class="token punctuation">.</span><span class="token function">SerializeObject</span><span class="token punctuation">(</span>payload<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token class-name"><span class="token keyword">var</span></span> content <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">StringContent</span><span class="token punctuation">(</span>
+        json<span class="token punctuation">,</span> Encoding<span class="token punctuation">.</span>UTF8<span class="token punctuation">,</span> <span class="token string">"application/json"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    using (var client = new HttpClient())
-    {
-        client.DefaultRequestHeaders.UserAgent
-            .ParseAdd(&quot;DS-Agent/1.0&quot;);
+    <span class="token keyword">using</span> <span class="token punctuation">(</span><span class="token class-name"><span class="token keyword">var</span></span> client <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">HttpClient</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        client<span class="token punctuation">.</span>DefaultRequestHeaders<span class="token punctuation">.</span>UserAgent
+            <span class="token punctuation">.</span><span class="token function">ParseAdd</span><span class="token punctuation">(</span><span class="token string">"DS-Agent/1.0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-        try
-        {
-            // Send the payload to the Azure Function
-            var response = client.PostAsync(
-                &quot;http://localhost:1234/AsyncFunction&quot;, content)
-                .GetAwaiter().GetResult();
+        <span class="token keyword">try</span>
+        <span class="token punctuation">{</span>
+            <span class="token comment">// Send the payload to the Azure Function</span>
+            <span class="token class-name"><span class="token keyword">var</span></span> response <span class="token operator">=</span> client<span class="token punctuation">.</span><span class="token function">PostAsync</span><span class="token punctuation">(</span>
+                <span class="token string">"http://localhost:1234/AsyncFunction"</span><span class="token punctuation">,</span> content<span class="token punctuation">)</span>
+                <span class="token punctuation">.</span><span class="token function">GetAwaiter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">GetResult</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new InvalidPluginExecutionException(
-                    $&quot;Function call failed with status code: &quot; +
-                    $&quot;{response.StatusCode}&quot;
-                );
-            }
+            <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>response<span class="token punctuation">.</span>IsSuccessStatusCode<span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">InvalidPluginExecutionException</span><span class="token punctuation">(</span>
+                    <span class="token interpolation-string"><span class="token string">$"Function call failed with status code: "</span></span> <span class="token operator">+</span>
+                    <span class="token interpolation-string"><span class="token string">$"</span><span class="token interpolation"><span class="token punctuation">{</span><span class="token expression language-csharp">response<span class="token punctuation">.</span>StatusCode</span><span class="token punctuation">}</span></span><span class="token string">"</span></span>
+                <span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token punctuation">}</span>
 
-            // Read and parse the response from the Azure Function
-            var resultJson = response.Content
-                .ReadAsStringAsync().GetAwaiter().GetResult();
+            <span class="token comment">// Read and parse the response from the Azure Function</span>
+            <span class="token class-name"><span class="token keyword">var</span></span> resultJson <span class="token operator">=</span> response<span class="token punctuation">.</span>Content
+                <span class="token punctuation">.</span><span class="token function">ReadAsStringAsync</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">GetAwaiter</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">GetResult</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            var resultObj = JsonConvert.DeserializeObject&lt;
-                Dictionary&lt;string, object&gt;&gt;(resultJson);
+            <span class="token class-name"><span class="token keyword">var</span></span> resultObj <span class="token operator">=</span> JsonConvert<span class="token punctuation">.</span><span class="token generic-method"><span class="token function">DeserializeObject</span><span class="token generic class-name"><span class="token punctuation">&lt;</span>
+                Dictionary<span class="token punctuation">&lt;</span><span class="token keyword">string</span><span class="token punctuation">,</span> <span class="token keyword">object</span><span class="token punctuation">></span><span class="token punctuation">></span></span></span><span class="token punctuation">(</span>resultJson<span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-            if (resultObj.TryGetValue(&quot;results&quot;, out var rawResults) &amp;&amp;
-                rawResults is JArray jResults)
-            {
-                var results = jResults.Select(x =&gt; x.ToString())
-                    .ToArray();
+            <span class="token keyword">if</span> <span class="token punctuation">(</span>resultObj<span class="token punctuation">.</span><span class="token function">TryGetValue</span><span class="token punctuation">(</span><span class="token string">"results"</span><span class="token punctuation">,</span> <span class="token keyword">out</span> <span class="token class-name"><span class="token keyword">var</span></span> rawResults<span class="token punctuation">)</span> <span class="token operator">&amp;&amp;</span>
+                rawResults <span class="token keyword">is</span> <span class="token class-name">JArray</span> jResults<span class="token punctuation">)</span>
+            <span class="token punctuation">{</span>
+                <span class="token class-name"><span class="token keyword">var</span></span> results <span class="token operator">=</span> jResults<span class="token punctuation">.</span><span class="token function">Select</span><span class="token punctuation">(</span>x <span class="token operator">=></span> x<span class="token punctuation">.</span><span class="token function">ToString</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                    <span class="token punctuation">.</span><span class="token function">ToArray</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-                // Log or process the results as needed
-                foreach (var result in results)
-                {
-                    // Example: Log each result (replace with actual logic)
-                    Console.WriteLine(result);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            throw new InvalidPluginExecutionException(
-                $&quot;An error occurred: {ex.Message}&quot;, ex);
-        }
-    }
-}
-</code></pre>
+                <span class="token comment">// Log or process the results as needed</span>
+                <span class="token keyword">foreach</span> <span class="token punctuation">(</span><span class="token class-name"><span class="token keyword">var</span></span> result <span class="token keyword">in</span> results<span class="token punctuation">)</span>
+                <span class="token punctuation">{</span>
+                    <span class="token comment">// Example: Log each result (replace with actual logic)</span>
+                    Console<span class="token punctuation">.</span><span class="token function">WriteLine</span><span class="token punctuation">(</span>result<span class="token punctuation">)</span><span class="token punctuation">;</span>
+                <span class="token punctuation">}</span>
+            <span class="token punctuation">}</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> ex<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            <span class="token keyword">throw</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">InvalidPluginExecutionException</span><span class="token punctuation">(</span>
+                <span class="token interpolation-string"><span class="token string">$"An error occurred: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token expression language-csharp">ex<span class="token punctuation">.</span>Message</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">,</span> ex<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
 <p><strong>Azure Function Code (AsyncFunction.cs)</strong></p>
 <p>This function receives a list of URLs, makes concurrent HTTP requests to them, and returns the combined results as JSON.</p>
-<pre><code class="language-csharp">[Function(&quot;AsyncFunction&quot;)]
-public async Task&lt;IActionResult&gt; Run(
-    [HttpTrigger(AuthorizationLevel.Anonymous, &quot;get&quot;, &quot;post&quot;)]
-    HttpRequest req)
-{
-    _logger.LogInformation(&quot;Processing request in AsyncFunction.&quot;);
+<pre class="language-csharp"><code class="language-csharp"><span class="token punctuation">[</span><span class="token attribute"><span class="token class-name">Function</span><span class="token attribute-arguments"><span class="token punctuation">(</span><span class="token string">"AsyncFunction"</span><span class="token punctuation">)</span></span></span><span class="token punctuation">]</span>
+<span class="token keyword">public</span> <span class="token keyword">async</span> <span class="token return-type class-name">Task<span class="token punctuation">&lt;</span>IActionResult<span class="token punctuation">></span></span> <span class="token function">Run</span><span class="token punctuation">(</span>
+    <span class="token punctuation">[</span><span class="token attribute"><span class="token class-name">HttpTrigger</span><span class="token attribute-arguments"><span class="token punctuation">(</span>AuthorizationLevel<span class="token punctuation">.</span>Anonymous<span class="token punctuation">,</span> <span class="token string">"get"</span><span class="token punctuation">,</span> <span class="token string">"post"</span><span class="token punctuation">)</span></span></span><span class="token punctuation">]</span>
+    <span class="token class-name">HttpRequest</span> req<span class="token punctuation">)</span>
+<span class="token punctuation">{</span>
+    _logger<span class="token punctuation">.</span><span class="token function">LogInformation</span><span class="token punctuation">(</span><span class="token string">"Processing request in AsyncFunction."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    string body;
-    try
-    {
-        body = await new StreamReader(req.Body).ReadToEndAsync();
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, &quot;Failed to read request body.&quot;);
-        return new BadRequestObjectResult(&quot;Invalid request body.&quot;);
-    }
+    <span class="token class-name"><span class="token keyword">string</span></span> body<span class="token punctuation">;</span>
+    <span class="token keyword">try</span>
+    <span class="token punctuation">{</span>
+        body <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">StreamReader</span><span class="token punctuation">(</span>req<span class="token punctuation">.</span>Body<span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">ReadToEndAsync</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> ex<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        _logger<span class="token punctuation">.</span><span class="token function">LogError</span><span class="token punctuation">(</span>ex<span class="token punctuation">,</span> <span class="token string">"Failed to read request body."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">BadRequestObjectResult</span><span class="token punctuation">(</span><span class="token string">"Invalid request body."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    JObject parsed;
-    try
-    {
-        parsed = JObject.Parse(body);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, &quot;Failed to parse JSON.&quot;);
-        return new BadRequestObjectResult(&quot;Invalid JSON format.&quot;);
-    }
+    <span class="token class-name">JObject</span> parsed<span class="token punctuation">;</span>
+    <span class="token keyword">try</span>
+    <span class="token punctuation">{</span>
+        parsed <span class="token operator">=</span> JObject<span class="token punctuation">.</span><span class="token function">Parse</span><span class="token punctuation">(</span>body<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> ex<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        _logger<span class="token punctuation">.</span><span class="token function">LogError</span><span class="token punctuation">(</span>ex<span class="token punctuation">,</span> <span class="token string">"Failed to parse JSON."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">BadRequestObjectResult</span><span class="token punctuation">(</span><span class="token string">"Invalid JSON format."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    var urls = parsed[&quot;urls&quot;]?.ToObject&lt;string[]&gt;() ?? Array.Empty&lt;string&gt;();
+    <span class="token class-name"><span class="token keyword">var</span></span> urls <span class="token operator">=</span> parsed<span class="token punctuation">[</span><span class="token string">"urls"</span><span class="token punctuation">]</span><span class="token punctuation">?.</span><span class="token generic-method"><span class="token function">ToObject</span><span class="token generic class-name"><span class="token punctuation">&lt;</span><span class="token keyword">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">></span></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">??</span> Array<span class="token punctuation">.</span><span class="token generic-method"><span class="token function">Empty</span><span class="token generic class-name"><span class="token punctuation">&lt;</span><span class="token keyword">string</span><span class="token punctuation">></span></span></span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    if (!urls.Any()){
-        _logger.LogWarning(&quot;No URLs provided in the request.&quot;);
-        return new BadRequestObjectResult(&quot;No URLs provided.&quot;);
-    }
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>urls<span class="token punctuation">.</span><span class="token function">Any</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">{</span>
+        _logger<span class="token punctuation">.</span><span class="token function">LogWarning</span><span class="token punctuation">(</span><span class="token string">"No URLs provided in the request."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">BadRequestObjectResult</span><span class="token punctuation">(</span><span class="token string">"No URLs provided."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    var tasks = urls.Select(async url =&gt;
-    {
-        try
-        {
-            _logger.LogInformation($&quot;Fetching data from URL: {url}&quot;);
-            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(&quot;DS-Agent/1.0&quot;);
-            return await _httpClient.GetStringAsync(url);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, $&quot;Failed to fetch data from URL: {url}&quot;);
-            return $&quot;Error fetching data from {url}: {ex.Message}&quot;;
-        }
-    });
+    <span class="token class-name"><span class="token keyword">var</span></span> tasks <span class="token operator">=</span> urls<span class="token punctuation">.</span><span class="token function">Select</span><span class="token punctuation">(</span><span class="token keyword">async</span> url <span class="token operator">=></span>
+    <span class="token punctuation">{</span>
+        <span class="token keyword">try</span>
+        <span class="token punctuation">{</span>
+            _logger<span class="token punctuation">.</span><span class="token function">LogInformation</span><span class="token punctuation">(</span><span class="token interpolation-string"><span class="token string">$"Fetching data from URL: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token expression language-csharp">url</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            _httpClient<span class="token punctuation">.</span>DefaultRequestHeaders<span class="token punctuation">.</span>UserAgent<span class="token punctuation">.</span><span class="token function">ParseAdd</span><span class="token punctuation">(</span><span class="token string">"DS-Agent/1.0"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token keyword">await</span> _httpClient<span class="token punctuation">.</span><span class="token function">GetStringAsync</span><span class="token punctuation">(</span>url<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+        <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> ex<span class="token punctuation">)</span>
+        <span class="token punctuation">{</span>
+            _logger<span class="token punctuation">.</span><span class="token function">LogError</span><span class="token punctuation">(</span>ex<span class="token punctuation">,</span> <span class="token interpolation-string"><span class="token string">$"Failed to fetch data from URL: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token expression language-csharp">url</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+            <span class="token keyword">return</span> <span class="token interpolation-string"><span class="token string">$"Error fetching data from </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token expression language-csharp">url</span><span class="token punctuation">}</span></span><span class="token string">: </span><span class="token interpolation"><span class="token punctuation">{</span><span class="token expression language-csharp">ex<span class="token punctuation">.</span>Message</span><span class="token punctuation">}</span></span><span class="token string">"</span></span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-    string[] results;
-    try
-    {
-        results = await Task.WhenAll(tasks);
-    }
-    catch (Exception ex)
-    {
-        _logger.LogError(ex, &quot;Error during parallel execution of HTTP requests.&quot;);
-        return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-    }
+    <span class="token class-name"><span class="token keyword">string</span><span class="token punctuation">[</span><span class="token punctuation">]</span></span> results<span class="token punctuation">;</span>
+    <span class="token keyword">try</span>
+    <span class="token punctuation">{</span>
+        results <span class="token operator">=</span> <span class="token keyword">await</span> Task<span class="token punctuation">.</span><span class="token function">WhenAll</span><span class="token punctuation">(</span>tasks<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">catch</span> <span class="token punctuation">(</span><span class="token class-name">Exception</span> ex<span class="token punctuation">)</span>
+    <span class="token punctuation">{</span>
+        _logger<span class="token punctuation">.</span><span class="token function">LogError</span><span class="token punctuation">(</span>ex<span class="token punctuation">,</span> <span class="token string">"Error during parallel execution of HTTP requests."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">StatusCodeResult</span><span class="token punctuation">(</span>StatusCodes<span class="token punctuation">.</span>Status500InternalServerError<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
 
-    var response = new
-    {
+    <span class="token class-name"><span class="token keyword">var</span></span> response <span class="token operator">=</span> <span class="token keyword">new</span>
+    <span class="token punctuation">{</span>
         results
-    };
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
 
-    _logger.LogInformation(&quot;Successfully processed all URLs.&quot;);
-    return new OkObjectResult(response);
-}
-</code></pre>
+    _logger<span class="token punctuation">.</span><span class="token function">LogInformation</span><span class="token punctuation">(</span><span class="token string">"Successfully processed all URLs."</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token constructor-invocation class-name">OkObjectResult</span><span class="token punctuation">(</span>response<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
 <p><strong>Example Input</strong></p>
-<pre><code class="language-json">{
-  &quot;urls&quot;: [
-    &quot;https://example.com/api/getdata1&quot;,
-    &quot;https://example.com/api/getdata2&quot;,
-    &quot;https://example.com/api/getdata3&quot;
-  ]
-}
-</code></pre>
+<pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"urls"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"https://example.com/api/getdata1"</span><span class="token punctuation">,</span>
+    <span class="token string">"https://example.com/api/getdata2"</span><span class="token punctuation">,</span>
+    <span class="token string">"https://example.com/api/getdata3"</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
 <p><strong>Example Output</strong></p>
-<pre><code class="language-json">{
-  &quot;results&quot;: [
-    &quot;{...data from getdata1...}&quot;,
-    &quot;{...data from getdata2...}&quot;,
-    &quot;{...data from getdata3...}&quot;
-  ]
-}
-</code></pre>
+<pre class="language-json"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"results"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"{...data from getdata1...}"</span><span class="token punctuation">,</span>
+    <span class="token string">"{...data from getdata2...}"</span><span class="token punctuation">,</span>
+    <span class="token string">"{...data from getdata3...}"</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
 <p><strong>Summary</strong></p>
 <p>Yes — it’s possible to get asynchronous behavior inside a synchronous Dataverse plugin. You just need to offload the parallel work to something that’s allowed to perform threading and asynchronous operations. In this case, that something is an Azure Function (but again - it could be something else), which can run the workload in parallel and return the result synchronously to the plugin.</p>
 
