@@ -8,6 +8,9 @@ title: dataversecoding.com
 <ul>
 {%- for post in collections.posts -%}
   <li>
+    {%- if post.data.date -%}
+      <time datetime="{{ post.data.date | dateFormat }}">{{ post.data.date | dateFormat }}</time> -
+    {%- endif -%}
     <a href="{{ post.url | url }}">
       {{ post.data.title }}
     </a>

@@ -3,6 +3,23 @@ layout: layout.njk
 ---
 
 <article>
-  <h1>{{ title }}</h1>
+    <h1>{{ title }}</h1>
+
+  {% if author or date %}
+  <p>
+    <em>
+    {% if author %}By {{ author }}{% endif %}{% if date %} on {{ date | dateFormat }}{% endif %}
+    </em>
+  </p>
+  {% endif %}
+
+  {% if tags %}
+  <p>
+    Tags:
+    {% for tag in tags %}
+      <span>{{ tag }}</span>{% if not loop.last %}, {% endif %}
+    {% endfor %}
+  </p>
+  {% endif %}
   {{ content | safe }}
 </article>
