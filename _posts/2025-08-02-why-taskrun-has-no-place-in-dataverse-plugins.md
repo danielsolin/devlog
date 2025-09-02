@@ -1,17 +1,14 @@
-***
-
-layout: post.njk\
-title: "Why Task.Run() Has No Place in Dataverse Plugins"\
-description: "An article about why Task.Run() should not be used in Dataverse plugins."\
-date: 2025-08-02\
+---
+layout: post.njk
+title: "Why Task.Run() Has No Place in Dataverse Plugins"
+description: "An article about why Task.Run() should not be used in Dataverse plugins."
+date: 2025-08-02
 tags:
-
-* Dataverse
-* Plugins
-* Task.Run
-* C#
-
-***
+  - Dataverse
+  - Plugins
+  - "Task.Run"
+  - "C#"
+---
 
 Dataverse plugins are isolated pieces of .NET code that run on the server when certain events happen. Like creating, updating, or deleting a record. You can register a plugin to run synchronously (runs immediately and blocks the request) or asynchronously (queued to run later).
 

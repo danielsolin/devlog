@@ -1,19 +1,16 @@
-***
-
-layout: post.njk\
-title: "Asynchronous Synchronous Dynamics 365 Plugins"\
-description: "An article about achieving asynchronous behavior in synchronous Dataverse plugins using Azure Functions."\
-date: 2025-08-08\
+---
+layout: post.njk
+title: "Asynchronous Synchronous Dynamics 365 Plugins"
+description: "An article about achieving asynchronous behavior in synchronous Dataverse plugins using Azure Functions."
+date: 2025-08-08
 tags:
-
-* Dataverse
-* Plugins
-* Azure Functions
-* C#
-* Asynchronous
-* Synchronous
-
-***
+  - Dataverse
+  - Plugins
+  - "Azure Functions"
+  - "C#"
+  - Asynchronous
+  - Synchronous
+---
 
 When developing plugins that interact with external APIs, you quickly run into a major limitation: 𝘁𝗵𝗲 𝗗𝗮𝘁𝗮𝘃𝗲𝗿𝘀𝗲 𝗽𝗹𝘂𝗴𝗶𝗻 𝘀𝗮𝗻𝗱𝗯𝗼𝘅 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗿𝗲𝗹𝗶𝗮𝗯𝗹𝘆 𝘀𝘂𝗽𝗽𝗼𝗿𝘁 𝗮𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 𝗲𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻. While it's technically possible to use async/await or Task.Run, doing so within the sandbox is risky and unsupported. These approaches may appear to work in development or isolated cases, but they often result in unpredictable behavior, such as deadlocks, thread aborts, or context corruption. Especially under load.
 
