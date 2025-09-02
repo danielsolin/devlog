@@ -1,6 +1,36 @@
-<hr>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ASYNCHRONOUS SYNCHRONOUS DYNAMICS 365 PLUGINS</title>
+    <link rel="stylesheet" href="/devlog/css/style.css" />
+  </head>
+  <body>
+    <main>
+<article>
+  <h1>ASYNCHRONOUS SYNCHRONOUS DYNAMICS 365 PLUGINS</h1>
+
+  
+  
+  <p>
+    <em>
+      By Daniel Solin on 2025-08-08
+    </em>
+  </p>
+   
+  <p>
+    Tags: 
+    <span>Dataverse</span>,  
+    <span>Plugins</span>,  
+    <span>Azure Functions</span>,  
+    <span>C#</span>,  
+    <span>Asynchronous</span>,  
+    <span>Synchronous</span> 
+  </p>
+   <hr>
 <p>layout: post.njk
-title: &quot;ASYNCHRONOUS SYNCHRONOUS DYNAMICS 365 PLUGINS&quot;
+title: &quot;Asynchronous Synchronous Dynamics 365 Plugins&quot;
 description: &quot;An article about achieving asynchronous behavior in synchronous Dataverse plugins using Azure Functions.&quot;
 date: 2025-08-08
 tags:</p>
@@ -13,8 +43,179 @@ tags:</p>
 <li>Synchronous</li>
 </ul>
 <hr>
-<p><strong>ASYNCHRONOUS SYNCHRONOUS DYNAMICS 365 PLUGINS</strong></p>
-<p><strong>𝗣𝗥𝗢𝗕𝗟𝗘𝗠: 𝗧𝗛𝗘 𝗦𝗬𝗡𝗖𝗛𝗥𝗢𝗡𝗢𝗨𝗦 𝗪𝗔𝗟𝗟 𝗜𝗡 𝗗𝗬𝗡𝗔𝗠𝗜𝗖𝗦 365 𝗣𝗟𝗨𝗚𝗜𝗡𝗦</strong></p>
+<p><strong>Asynchronous Synchronous Dynamics 365 Plugins</strong></p>
+<p><strong>Problem: The Synchronous Wall in Dynamics 365 Plugins</strong></p>
+<p>When developing plugins that interact with external APIs, you quickly run into a major limitation: 𝘁𝗵𝗲 𝗗𝗮𝘁𝗮𝘃𝗲𝗿𝘀𝗲 𝗽𝗹𝘂𝗴𝗶𝗻 𝘀𝗮𝗻𝗱𝗯𝗼𝘅 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗿𝗲𝗹𝗶𝗮𝗯𝗹𝘆 𝘀𝘂𝗽𝗽𝗼𝗿𝘁 𝗮𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 𝗲𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻. While it's technically possible to use async/await or Task.Run, doing so within the sandbox is risky and unsupported. These approaches may appear to work in development or isolated cases, but they often result in unpredictable behavior, such as deadlocks, thread aborts, or context corruption. Especially under load.</p>
+<p>Because all plugin code must be 𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 and complete within its execution time limits, scenarios that would benefit from parallelism — like making multiple HTTP calls simultaneously — become difficult or unsafe to implement directly in the plugin.</p>
+<p>Full source code for this article can be found here:</p>
+<p>https://github.com/danielsolin/articles/tree/main/DS.Articles.AsyncSyncPlugin</p>
+<p><strong>Solution: Async Work Via Azure Functions</strong></p>
+<p>To work around this limitation, we can use an Azure Function to handle the parallelism. This function handles concurrent tasks (like multiple API calls), while the plugin remains completely synchronous. The plugin sends a payload to the function, blocks synchronously for the result, and then continues with normal logic.</p>
+<p>An Azure Function is used in this example, but it could be anything that supports asynchronous operations and can be called synchronously from the plugin.</p>
+<p><strong>Plugin Code (SyncPlugin.cs)</strong></p>
+<p>The plugin gathers a list of URLs, serializes them to JSON, sends them to the Azure Function, and synchronously waits for the combined result.</p>
+<pre><code class="language-csharp">public void Execute(IServiceProvider serviceProvider)
+{
+    // Define the URLs to be processed by the Azure Function
+    var urls = new[]
+    {
+        &quot;https://example.com/api/getdata1&quot;,
+        &quot;https://example.com/api/getdata2&quot;,
+        &quot;https://example.com/api/getdata3&quot;
+    };
+
+    // Prepare the payload to send to the Azure Function
+    var payload = new
+    {
+        urls
+    };
+
+    var json = JsonConvert.SerializeObject(payload);
+    var content = new StringContent(
+        json, Encoding.UTF8, &quot;application/json&quot;);
+
+    using (var client = new HttpClient())
+    {
+        client.DefaultRequestHeaders.UserAgent
+            .ParseAdd(&quot;DS-Agent/1.0&quot;);
+
+        try
+        {
+            // Send the payload to the Azure Function
+            var response = client.PostAsync(
+                &quot;http://localhost:1234/AsyncFunction&quot;, content)
+                .GetAwaiter().GetResult();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new InvalidPluginExecutionException(
+                    $&quot;Function call failed with status code: &quot; +
+                    $&quot;{response.StatusCode}&quot;
+                );
+            }
+
+            // Read and parse the response from the Azure Function
+            var resultJson = response.Content
+                .ReadAsStringAsync().GetAwaiter().GetResult();
+
+            var resultObj = JsonConvert.DeserializeObject&lt;
+                Dictionary&lt;string, object&gt;&gt;(resultJson);
+
+            if (resultObj.TryGetValue(&quot;results&quot;, out var rawResults) &amp;&amp;
+                rawResults is JArray jResults)
+            {
+                var results = jResults.Select(x =&gt; x.ToString())
+                    .ToArray();
+
+                // Log or process the results as needed
+                foreach (var result in results)
+                {
+                    // Example: Log each result (replace with actual logic)
+                    Console.WriteLine(result);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new InvalidPluginExecutionException(
+                $&quot;An error occurred: {ex.Message}&quot;, ex);
+        }
+    }
+}
+</code></pre>
+<p><strong>Azure Function Code (AsyncFunction.cs)</strong></p>
+<p>This function receives a list of URLs, makes concurrent HTTP requests to them, and returns the combined results as JSON.</p>
+<pre><code class="language-csharp">[Function(&quot;AsyncFunction&quot;)]
+public async Task&lt;IActionResult&gt; Run(
+    [HttpTrigger(AuthorizationLevel.Anonymous, &quot;get&quot;, &quot;post&quot;)]
+    HttpRequest req)
+{
+    _logger.LogInformation(&quot;Processing request in AsyncFunction.&quot;);
+
+    string body;
+    try
+    {
+        body = await new StreamReader(req.Body).ReadToEndAsync();
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, &quot;Failed to read request body.&quot;);
+        return new BadRequestObjectResult(&quot;Invalid request body.&quot;);
+    }
+
+    JObject parsed;
+    try
+    {
+        parsed = JObject.Parse(body);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, &quot;Failed to parse JSON.&quot;);
+        return new BadRequestObjectResult(&quot;Invalid JSON format.&quot;);
+    }
+
+    var urls = parsed[&quot;urls&quot;]?.ToObject&lt;string[]&gt;() ?? Array.Empty&lt;string&gt;();
+
+    if (!urls.Any()){
+        _logger.LogWarning(&quot;No URLs provided in the request.&quot;);
+        return new BadRequestObjectResult(&quot;No URLs provided.&quot;);
+    }
+
+    var tasks = urls.Select(async url =&gt;
+    {
+        try
+        {
+            _logger.LogInformation($&quot;Fetching data from URL: {url}&quot;);
+            _httpClient.DefaultRequestHeaders.UserAgent.ParseAdd(&quot;DS-Agent/1.0&quot;);
+            return await _httpClient.GetStringAsync(url);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $&quot;Failed to fetch data from URL: {url}&quot;);
+            return $&quot;Error fetching data from {url}: {ex.Message}&quot;;
+        }
+    });
+
+    string[] results;
+    try
+    {
+        results = await Task.WhenAll(tasks);
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, &quot;Error during parallel execution of HTTP requests.&quot;);
+        return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+    }
+
+    var response = new
+    {
+        results
+    };
+
+    _logger.LogInformation(&quot;Successfully processed all URLs.&quot;);
+    return new OkObjectResult(response);
+}
+</code></pre>
+<p><strong>Example Input</strong></p>
+<pre><code class="language-json">{
+  &quot;urls&quot;: [
+    &quot;https://example.com/api/getdata1&quot;,
+    &quot;https://example.com/api/getdata2&quot;,
+    &quot;https://example.com/api/getdata3&quot;
+  ]
+}
+</code></pre>
+<p><strong>Example Output</strong></p>
+<pre><code class="language-json">{
+  &quot;results&quot;: [
+    &quot;{...data from getdata1...}&quot;,
+    &quot;{...data from getdata2...}&quot;,
+    &quot;{...data from getdata3...}&quot;
+  ]
+}
+</code></pre>
+<p><strong>Summary</strong></p>
+<p>Yes — it’s possible to get asynchronous behavior inside a synchronous Dataverse plugin. You just need to offload the parallel work to something that’s allowed to perform threading and asynchronous operations. In this case, that something is an Azure Function (but again - it could be something else), which can run the workload in parallel and return the result synchronously to the plugin.</p>
 <p>When developing plugins that interact with external APIs, you quickly run into a major limitation: 𝘁𝗵𝗲 𝗗𝗮𝘁𝗮𝘃𝗲𝗿𝘀𝗲 𝗽𝗹𝘂𝗴𝗶𝗻 𝘀𝗮𝗻𝗱𝗯𝗼𝘅 𝗱𝗼𝗲𝘀 𝗻𝗼𝘁 𝗿𝗲𝗹𝗶𝗮𝗯𝗹𝘆 𝘀𝘂𝗽𝗽𝗼𝗿𝘁 𝗮𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 𝗲𝘅𝗲𝗰𝘂𝘁𝗶𝗼𝗻. While it's technically possible to use async/await or Task.Run, doing so within the sandbox is risky and unsupported. These approaches may appear to work in development or isolated cases, but they often result in unpredictable behavior, such as deadlocks, thread aborts, or context corruption. Especially under load.</p>
 <p>Because all plugin code must be 𝘀𝘆𝗻𝗰𝗵𝗿𝗼𝗻𝗼𝘂𝘀 and complete within its execution time limits, scenarios that would benefit from parallelism — like making multiple HTTP calls simultaneously — become difficult or unsafe to implement directly in the plugin.</p>
 <p>Full source code for this article can be found here:</p>
@@ -281,3 +482,12 @@ public async Task&lt;IActionResult&gt; Run(
 </code></pre>
 <p><strong>𝗦𝗨𝗠𝗠𝗔𝗥𝗬</strong></p>
 <p>Yes, it’s possible to get asynchronous behavior inside a synchronous Dataverse plugin. You just need to offload the parallel work to something that’s allowed to perform threading and asynchronous operations. In this case, that something is an Azure Function (but again - it could be something else), which can run the workload in parallel and return the result synchronously to the plugin.</p>
+
+
+  <footer>
+    <a href="javascript:history.back()">Back</a>
+  </footer>
+</article>
+</main>
+  </body>
+</html>
