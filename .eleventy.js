@@ -21,6 +21,7 @@ module.exports = function(eleventyConfig) {
       data: "_data",
       output: "_site",
     },
+    pathPrefix: "/devlog/",
     templateFormats: ["md", "njk", "html"],
     markdownTemplateEngine: "njk",
     htmlTemplateEngine: "njk",
