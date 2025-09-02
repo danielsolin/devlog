@@ -3,25 +3,21 @@ layout: layout.njk
 ---
 
 <article>
-    <h1>{{ title }}</h1>
+  <h1>{{ title }}</h1>
 
   {% if author or date %}
   <p>
     <em>
-    {% if author %}By {{ author }}{% endif %}{% if date %} on {{ date | dateFormat }}{% endif %}
+      {% if author %}By {{ author }}{% endif %}{% if date %} on {{ date |
+      dateFormat }}{% endif %}
     </em>
   </p>
-  {% endif %}
-
-  {% if tags %}
+  {% endif %} {% if tags %}
   <p>
-    Tags:
-    {% for tag in tags %}
-      <span>{{ tag }}</span>{% if not loop.last %}, {% endif %}
-    {% endfor %}
+    Tags: {% for tag in tags %}
+    <span>{{ tag }}</span>{% if not loop.last %}, {% endif %} {% endfor %}
   </p>
-  {% endif %}
-  {{ content | safe }}
+  {% endif %} {{ content | safe }}
 
   <footer>
     <a href="javascript:history.back()">Back</a>

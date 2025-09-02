@@ -28,10 +28,10 @@ This is a blog about software development using [Eleventy](https://www.11ty.dev/
 
 ## Project Structure
 
--   `_posts/`: All your blog posts go here as Markdown files.
--   `_includes/`: This directory is for Eleventy layouts and other partial templates.
--   `.eleventy.js`: The main configuration file for Eleventy.
--   `_site/`: The generated output of your site. This directory is not checked into version control.
+- `_posts/`: All your blog posts go here as Markdown files.
+- `_includes/`: This directory is for Eleventy layouts and other partial templates.
+- `.eleventy.js`: The main configuration file for Eleventy.
+- `_site/`: The generated output of your site. This directory is not checked into version control.
 
 ## Adding new posts
 
@@ -41,6 +41,6 @@ To create a new blog post, simply add a new Markdown file to the `_posts` direct
 
 You can deploy the contents of the `_site` directory to any static hosting service, such as:
 
--   [GitHub Pages](https://pages.github.com/)
--   [Netlify](https://www.netlify.com/)
--   [Vercel](https://vercel.com/)
+- [GitHub Pages](https://pages.github.com/)
+- [Netlify](https://www.netlify.com/)
+- [Vercel](https://vercel.com/)

@@ -6,14 +6,14 @@ title: devlog.se
 <h1>devlog.se</h1>
 
 <ul>
-{%- for post in collections.posts -%}
+  {%- for post in collections.posts -%}
   <li>
     {%- if post.data.date -%}
-      <time datetime="{{ post.data.date | dateFormat }}">{{ post.data.date | dateFormat }}</time> -
-    {%- endif -%}
-    <a href="{{ post.url | url }}">
-      {{ post.data.title }}
-    </a>
+    <time datetime="{{ post.data.date | dateFormat }}"
+      >{{ post.data.date | dateFormat }}</time
+    >
+    - {%- endif -%}
+    <a href="{{ post.url | url }}">{{ post.data.title }}</a>
   </li>
-{%- endfor -%}
+  {%- endfor -%}
 </ul>

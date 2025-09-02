@@ -3,3 +3,12 @@ GEMINI.md
 
 # Visual Studio
 .vs/
+
+# Node
+node_modules/
+
+# Eleventy
+_site/
+
+# OS generated files
+.DS_Store
