@@ -16,10 +16,6 @@ When developing plugins that interact with external APIs, you quickly run into a
 
 Because all plugin code must be **synchronous** and complete within its execution time limits, scenarios that would benefit from parallelism — like making multiple HTTP calls simultaneously — become difficult or unsafe to implement directly in the plugin.
 
-Full source code for this article can be found here:
-
-https://github.com/danielsolin/articles/tree/main/DS.Articles.AsyncSyncPlugin
-
 **Solution: Async Work Via Azure Functions**
 
 To work around this limitation, we can use an Azure Function to handle the parallelism. This function handles concurrent tasks (like multiple API calls), while the plugin remains completely synchronous. The plugin sends a payload to the function, blocks synchronously for the result, and then continues with normal logic.
