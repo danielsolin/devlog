@@ -1,4 +1,4 @@
-# A statically generated blog about software development
+# A statically generated blog
 
 This is a blog about software development using [Eleventy](https://www.11ty.dev/) to generate a static website from Markdown files.
 
